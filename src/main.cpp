@@ -9,7 +9,7 @@ int main() {
 	data_generator::print_array<uint64_t>(rnd_arr, 10);
 
 	std::cout << std::endl;
-	Sorter<uint64_t>::insertion_sort_bin(rnd_arr, 10);
+	Sorter<uint64_t>::shell_sort_trivial(rnd_arr, 10);
 
 	data_generator::print_array<uint64_t>(rnd_arr, 10);
 
