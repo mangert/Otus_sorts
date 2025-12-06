@@ -91,7 +91,7 @@ public:
             [](size_t g) { return g / 2; });
     }
 
-    // 2. Кнута (1, 4, 13, 40, 121, ...)
+    // 2. Последовательность Кнута (1, 4, 13, 40, 121, ...)
     static void shell_sort_knuth(T* data, size_t size) {
         if (size <= 1) return;
 
@@ -105,7 +105,7 @@ public:
             [](size_t g) { return (g - 1) / 3; });  // точная формула
     }
 
-    // 3. Хиббарда (1, 3, 7, 15, 31, ...)
+    // 3. Последовательность Хиббарда (1, 3, 7, 15, 31, ...)
     static void shell_sort_hibbard(T* data, size_t size) {
         if (size <= 1) return;
 
@@ -118,29 +118,23 @@ public:
             [](size_t g) { return (g + 1) / 2 - 1; });
     }
 
-    // 4. Седжвика
+    // 4. Последовательность Седжвика (1, 5, 19, 41, 109,...)
     static void shell_sort_sedgewick(T* data, size_t size) {
+        
+        if (size > MAX_SUPPORTED_SIZE) { //длина предрассчитанного массива gap ограничена
+            throw std::invalid_argument(
+                "shell_sort_sedgewick: size " + std::to_string(size) +
+                " exceeds maximum supported size " + std::to_string(MAX_SUPPORTED_SIZE)
+            );
+        };
         if (size <= 1) return;
-
-        // Генерация последовательности Седжвика
-        std::vector<size_t> gaps;
-        size_t k = 0;
-        while (true) {
-            size_t gap;
-            if (k % 2 == 0) {
-                gap = 9 * (1 << k) - 9 * (1 << (k / 2)) + 1;
-            }
-            else {
-                gap = 8 * (1 << k) - 6 * (1 << ((k + 1) / 2)) + 1;
-            }
-            if (gap >= size) break;
-            gaps.push_back(gap);
-            ++k;
-        }
-
+        
+        //определяем индекс минимального гэп, меньшего чем наш размер (берем следующий, уменьшать будем внутри цикла)
+        size_t initial_idx = binary_find(SEDGEWICK_GAPS, size, std::size(SEDGEWICK_GAPS));        
+        
         // Сортируем с gaps в обратном порядке (от большего к меньшему)
-        for (auto it = gaps.rbegin(); it != gaps.rend(); ++it) {
-            size_t gap = *it;
+        for(size_t gap_idx = initial_idx; gap_idx > 0;) {
+            size_t gap = SEDGEWICK_GAPS[--gap_idx];
             // Вставками с шагом gap
             for (size_t i = gap; i < size; ++i) {
                 T current = data[i];
@@ -178,7 +172,18 @@ public:
     static void bubble_sort(Container& container) {
         bubble_sort(container.data(), container.size());
     }
-private:    
+private:
+    //константы для последовательности Седжвика
+    
+    static constexpr size_t SEDGEWICK_GAPS[] = {
+    1, 5, 19, 41, 109, 209, 505, 929, 2161, 3905, 8929,
+    16001, 36289, 64769, 146305, 260609, 587521, 1045505,
+    2354689, 4188161, 9427969, 16764929, 37730305, 67084289,
+    150958081, 268386305, 603906049, 1073643521, 2415771649
+    // для размеров 32 бит
+    };
+    static constexpr size_t MAX_SUPPORTED_SIZE = 4831543297ULL //(2415771649 * 2 - 1);
+
     // Обобщенная версия сортировки Шелла
     template<typename GapFunc>
     static void shell_sort_core(T* data, size_t size, size_t initial_gap, GapFunc next_gap) {

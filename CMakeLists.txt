@@ -12,7 +12,7 @@ endif()
 project ("Sorts")
 
 # Add source to this project's executable.
-add_executable (Sorts "src/main.cpp")
+add_executable (Sorts "src/main.cpp" "headers/Test.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Sorts PROPERTY CXX_STANDARD 20)
@@ -25,11 +25,11 @@ target_include_directories(Sorts PRIVATE
 )
 
 # Опция для указания пути к тестам
-#set(TEST_DIR "${CMAKE_SOURCE_DIR}/Tests" CACHE PATH "Path to test files")
+set(TEST_DIR "${CMAKE_SOURCE_DIR}/Tests" CACHE PATH "Path to test files")
 
 # Копируем тесты в build directory
-#file(COPY ${TEST_DIR} DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ${TEST_DIR} DESTINATION ${CMAKE_BINARY_DIR})
 
 # Передаем путь к тестам в код
-#target_compile_definitions(Sorts PRIVATE 
- #   TEST_DIR="${CMAKE_BINARY_DIR}/Tests")
+target_compile_definitions(Sorts PRIVATE 
+   TEST_DIR="${CMAKE_BINARY_DIR}/Tests")
